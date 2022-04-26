@@ -1,0 +1,37 @@
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>Archetype Created Web Application</display-name>
+  <servlet>
+  	<servlet-name>FileUpload</servlet-name>
+  	<display-name>FileUpload</display-name>
+  	<description></description>
+  	<servlet-class>com.jordan.FileUpload</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>TrainModel</servlet-name>
+  	<display-name>TrainModel</display-name>
+  	<description></description>
+  	<servlet-class>com.jordan.TrainModel</servlet-class>
+  </servlet>
+  <servlet>
+  	<servlet-name>TestModel</servlet-name>
+  	<display-name>TestModel</display-name>
+  	<description></description>
+  	<servlet-class>com.jordan.TestModel</servlet-class>
+  </servlet>
+  <servlet-mapping>
+  	<servlet-name>FileUpload</servlet-name>
+  	<url-pattern>/upload</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>TrainModel</servlet-name>
+  	<url-pattern>/train</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+  	<servlet-name>TestModel</servlet-name>
+  	<url-pattern>/test</url-pattern>
+  </servlet-mapping>
+</web-app>
