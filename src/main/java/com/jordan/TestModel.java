@@ -29,6 +29,8 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 // a class to test the model
 public class TestModel extends HttpServlet {
 	
+	static TestSmile model1;
+	
 	// a post method to get all the testing data set and trest the model
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
@@ -63,7 +65,10 @@ public class TestModel extends HttpServlet {
 					test = Read.csv("D://java-web/ModelUpload/storage/" + item.getName());
 					
 					// and we test the model with that file
-				res = model.testModel(test);
+					res = model.testModel(test);
+					
+					// without raeding an object from file
+					//res = model1.testModel(test);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}		
@@ -79,7 +84,7 @@ public class TestModel extends HttpServlet {
 			 out.print("{ TestResults:"+Arrays.toString(res)+"}");
 			 out.flush();
 	    }
-	    
+	    System.out.println(a);
 	 
 	}   
 	

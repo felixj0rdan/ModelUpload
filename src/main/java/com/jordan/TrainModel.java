@@ -74,13 +74,16 @@ public class TrainModel extends HttpServlet {
 			// to show model metrics
 			System.out.println(model.metrics);	
 			
-//			// to return the metrics
+			// to return the metrics
 		    try(PrintWriter out = response.getWriter();){
 		    	response.setContentType("application/json");
 				 out.print(model.metrics);
 				 out.flush();
 		    }
+
+		    // to use it without storing it to the local storage
+		    TestModel.model1 = model;
 		} 
 
-		}
+	}
 }
