@@ -83,9 +83,7 @@ public class TestModel extends HttpServlet {
 	    	response.setContentType("application/json");
 			 out.print("{ TestResults:"+Arrays.toString(res)+"}");
 			 out.flush();
-	    }
-	    System.out.println(a);
-	 
+	    }	 
 	}   
 	
 }
