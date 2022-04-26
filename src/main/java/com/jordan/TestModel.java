@@ -47,7 +47,6 @@ public class TestModel extends HttpServlet {
    
 		// get model to be used
     	String modelName = request.getParameter("modelName");
-    	System.out.println(modelName);
 		
 		// now to load the trained model to a TestSmile object we first locate the .model file 
 		String filename = localDir+"\\ModelUpload\\MLmodel\\"+modelName+".model";
