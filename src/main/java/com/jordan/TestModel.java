@@ -2,9 +2,11 @@ package com.jordan;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import jakarta.websocket.server.PathParam;
 import smile.data.DataFrame;
 import smile.io.Read;
@@ -12,6 +14,7 @@ import smile.io.Read;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -31,59 +34,54 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
 
 // a class to test the model
+@MultipartConfig
 public class TestModel extends HttpServlet {
 	
-	protected static TestSmile model1;
 	private static Logger logger = Logger.getLogger("");
 	
-	// a post method to get all the testing data set and trest the model
+	// a post method to get all the testing data set and rest the model
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		// to get the root working directory
 		String localDir = System.getProperty("user.dir");
-		System.out.println(localDir);
+   
+		// get model to be used
+    	String modelName = request.getParameter("modelName");
+    	System.out.println(modelName);
 		
 		// now to load the trained model to a TestSmile object we first locate the .model file 
-		String filename = localDir+"\\ModelUpload\\MLmodel\\model.model";
+		String filename = localDir+"\\ModelUpload\\MLmodel\\"+modelName+".model";
 	    File file = new File(filename);
 	    
 	    // new model is created to store the read model
 	    TestSmile model = null;
 	    int[] res = null;
+	    
 	    // try with resources block to read the .model file to an object
 	    try(FileInputStream fis = new FileInputStream(file);
-		ObjectInputStream ois =  new  ObjectInputStream(fis)){
-	    	
-	    	
-	    	// now we will read all the testing file we receive and store them in a list
-	    	ServletFileUpload sf = new ServletFileUpload(new DiskFileItemFactory());
-			List<FileItem> multiFile = sf.parseRequest(new ServletRequestContext(request));
+		ObjectInputStream ois =  new  ObjectInputStream(fis)){		
+			
 			List<int[]> result = new ArrayList<>();
 			// the read object is stored in model object
 			model = (TestSmile) ois.readObject();
 			
 			
-			// now the list of files is iterated and the testing is carried on
-			for (FileItem item : multiFile) {
-				DataFrame test = null;
+			// now the testing is carried on with the testing file
+			DataFrame test = null;
+			
+			try {
+				Part part = request.getPart("file");
+				String filePath = localDir+"\\ModelUpload\\src\\main\\java\\storage\\" + part.getSubmittedFileName();
+				part.write(filePath);
+				test = Read.csv(filePath);
 				
-				try {
-					
-					// we write and read the file
-					String filePath = localDir+"\\ModelUpload\\src\\main\\java\\storage" + item.getName().toString();
-					item.write(new File(filePath));
-					test = Read.csv(filePath);
-					
-					// and we test the model with that file
-					res = model.testModel(test);
-					
-					// without reading an object from file
-					//res = model1.testModel(test);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}		
+				// and we test the model with that file
+				res = model.testModel(test);
 				
-			}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}		
+
 	    } catch (ClassNotFoundException e1) {
 			e1.printStackTrace();
 		} 

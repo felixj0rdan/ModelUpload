@@ -10,8 +10,10 @@ import jakarta.websocket.server.PathParam;
 import smile.data.DataFrame;
 import smile.io.Read;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
@@ -19,10 +21,17 @@ import java.io.PrintWriter;
 //import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Logger;
+
+import javax.swing.filechooser.FileSystemView;
+
 import java.util.logging.Level;
 
 //import javax.servlet.ServletException;
@@ -50,9 +59,24 @@ public class TrainModel extends HttpServlet {
 		// to get the root working directory
 		String localDir = System.getProperty("user.dir");
 		System.out.println(localDir);		
+		
+		// create a new model file name
+		String modelsListFile = localDir+"\\ModelUpload\\MLmodel\\ListOfModels.txt";
+		Random random = new Random();
+		String newFile = "Model_"+String.format("%04d", random.nextInt(10000));	
+		
+		ArrayList<String> modelList = new ArrayList<>(Files.readAllLines(Paths.get(modelsListFile)));
+		System.out.println(modelList);
+		
+		while(modelList.contains(newFile)) {
+			newFile = "Model_"+String.format("%04d", random.nextInt(10000));
+		}
+		
+		System.out.println(newFile);
+		modelList.add(newFile);
 			
 		// filename will have the path where the trained model will be stored
-		String filename = localDir+"/ModelUpload/MLmodel/model.model";
+		String filename = localDir+"/ModelUpload/MLmodel/" + newFile +".model";
 		File file = new File(filename); // a new file is created at that location to store the data
 		
 		
@@ -85,8 +109,7 @@ public class TrainModel extends HttpServlet {
 			}
 			
 			// to log the model metrics	
-//			if(model.metrics != null)
-//			logger.log(Level.INFO, model.metrics.toString());		
+			logger.log(Level.INFO, model.metrics.toString());		
 			
 			// to return the metrics
 		    try(PrintWriter out = response.getWriter();){
@@ -99,9 +122,16 @@ public class TrainModel extends HttpServlet {
 		    	System.out.println(e);
 		    	logger.warning(e.toString());
 			}
-
-		    // to use it without storing it to the local storage
-		    TestModel.model1 = model;
+		    
+		    try(FileWriter fileWriter = new FileWriter(modelsListFile);
+		            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter))
+		            {
+		    			for(String line: modelList) {
+		    				bufferedWriter.append(line);
+		    				bufferedWriter.newLine();        	
+		    			}
+		            } catch(IOException ex) {
+		                System.out.println("Error writing to file '"+ filename + "'");}
 		}
 		catch (Exception e) {
 			// TODO: handle exception
