@@ -18,10 +18,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.RequestContext;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
+
+import com.google.gson.Gson;
+
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 
@@ -29,13 +33,18 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 // a class to test the model
 public class TestModel extends HttpServlet {
 	
-	static TestSmile model1;
+	protected static TestSmile model1;
+	private static Logger logger = Logger.getLogger("");
 	
 	// a post method to get all the testing data set and trest the model
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
-		// now to load the trainded model to a TestSmile object we first locate the .model file 
-		String filename = "D:\\java-web\\ModelUpload\\MLmodel\\model.model";
+		// to get the root working directory
+		String localDir = System.getProperty("user.dir");
+		System.out.println(localDir);
+		
+		// now to load the trained model to a TestSmile object we first locate the .model file 
+		String filename = localDir+"\\ModelUpload\\MLmodel\\model.model";
 	    File file = new File(filename);
 	    
 	    // new model is created to store the read model
@@ -61,13 +70,14 @@ public class TestModel extends HttpServlet {
 				try {
 					
 					// we write and read the file
-					item.write(new File("D://java-web/ModelUpload/storage/" + item.getName()));
-					test = Read.csv("D://java-web/ModelUpload/storage/" + item.getName());
+					String filePath = localDir+"\\ModelUpload\\src\\main\\java\\storage" + item.getName().toString();
+					item.write(new File(filePath));
+					test = Read.csv(filePath);
 					
 					// and we test the model with that file
 					res = model.testModel(test);
 					
-					// without raeding an object from file
+					// without reading an object from file
 					//res = model1.testModel(test);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -80,10 +90,18 @@ public class TestModel extends HttpServlet {
 	    
 	    // to return the prediction
 	    try(PrintWriter out = response.getWriter();){
+	    	
+	    	ReturnModel mod = new ReturnModel(res, model.metrics.accuracy*100, model.metrics.fitTime);
+	    	String modelJsonString = new Gson().toJson(mod);
 	    	response.setContentType("application/json");
-			 out.print("{ TestResults:"+Arrays.toString(res)+"}");
-			 out.flush();
+			out.print(modelJsonString);
+			out.flush();
 	    }	 
+	    catch (Exception e) {
+			// TODO: handle exception
+	    	System.out.println(e);
+	    	logger.warning(e.toString());	
+		}
 	}   
 	
 }

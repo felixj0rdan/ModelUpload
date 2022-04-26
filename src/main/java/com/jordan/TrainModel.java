@@ -1,6 +1,7 @@
 package com.jordan;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,9 +16,14 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+//import java.lang.System.Logger.Level;
 import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 //import javax.servlet.ServletException;
 //import javax.servlet.http.HttpServletRequest;
@@ -36,11 +42,17 @@ import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 // a class to train the model
 public class TrainModel extends HttpServlet {
 	
+	private static Logger logger = Logger.getLogger("");
+	
 	// a post method to get training data set
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException { 
 		
+		// to get the root working directory
+		String localDir = System.getProperty("user.dir");
+		System.out.println(localDir);		
+			
 		// filename will have the path where the trained model will be stored
-		String filename = "D:\\java-web\\ModelUpload\\MLmodel\\model.model";
+		String filename = localDir+"/ModelUpload/MLmodel/model.model";
 		File file = new File(filename); // a new file is created at that location to store the data
 		
 		
@@ -59,8 +71,9 @@ public class TrainModel extends HttpServlet {
 				try {
 					
 					// we write and read the file
-					item.write(new File("D://java-web/ModelUpload/storage/" + item.getName()));
-					train = Read.csv("D://java-web/ModelUpload/storage/" + item.getName());
+					String filePath = localDir+"\\ModelUpload\\src\\main\\java\\storage\\" + item.getName();
+					item.write(new File(filePath));
+					train = Read.csv(filePath); 
 					
 					// now with that file we train the model and write it to a .model file
 					model.trainModel(train);
@@ -71,8 +84,9 @@ public class TrainModel extends HttpServlet {
 				}				
 			}
 			
-			// to show model metrics
-			System.out.println(model.metrics);	
+			// to log the model metrics	
+//			if(model.metrics != null)
+//			logger.log(Level.INFO, model.metrics.toString());		
 			
 			// to return the metrics
 		    try(PrintWriter out = response.getWriter();){
@@ -80,10 +94,20 @@ public class TrainModel extends HttpServlet {
 				 out.print(model.metrics);
 				 out.flush();
 		    }
+		    catch (Exception e) {
+				// TODO: handle exception
+		    	System.out.println(e);
+		    	logger.warning(e.toString());
+			}
 
 		    // to use it without storing it to the local storage
 		    TestModel.model1 = model;
-		} 
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e);
+			logger.warning(e.toString());	
+		}
 
 	}
 }

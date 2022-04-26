@@ -22,10 +22,10 @@ public class TestSmile implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	// variables to store the attributes of the objects created
-	RandomForest forest; // stores the trained forest
-	ClassificationMetrics metrics; // stores the metrics of the forest
-	double accuracy; // holds the accuracy value of the model
-	int[] testResult; // store the test result array to compute accuracy
+	public RandomForest forest; // stores the trained forest
+	public ClassificationMetrics metrics; // stores the metrics of the forest
+	public double accuracy = 0.0; // holds the accuracy value of the model
+	public int[] testResult; // store the test result array to compute accuracy
 	
 	
 	// function to train the created model
