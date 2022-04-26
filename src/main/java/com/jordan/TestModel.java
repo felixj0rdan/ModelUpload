@@ -75,8 +75,8 @@ public class TestModel extends HttpServlet {
 	    
 	    // to return the prediction
 	    try(PrintWriter out = response.getWriter();){
-	    	response.setContentType("text");
-			 out.print(Arrays.toString(res));
+	    	response.setContentType("application/json");
+			 out.print("{ TestResults:"+Arrays.toString(res)+"}");
 			 out.flush();
 	    }
 	    

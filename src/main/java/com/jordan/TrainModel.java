@@ -76,7 +76,7 @@ public class TrainModel extends HttpServlet {
 			
 //			// to return the metrics
 		    try(PrintWriter out = response.getWriter();){
-		    	response.setContentType("text");
+		    	response.setContentType("application/json");
 				 out.print(model.metrics);
 				 out.flush();
 		    }
