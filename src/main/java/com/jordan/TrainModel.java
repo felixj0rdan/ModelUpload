@@ -170,7 +170,7 @@ class ReturnTrained{
 		this.scoreTime = scoreTime;
 		this.validationDataSize = validationDataSize;
 		this.error = error;
-		this.accuracy = accuracy;
+		this.accuracy = accuracy*100;
 		this.modelName = modelName;
 	}	
 }
