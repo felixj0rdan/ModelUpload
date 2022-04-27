@@ -40,6 +40,9 @@ import java.util.logging.Level;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.RequestContext;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
+
+import com.google.gson.Gson;
+
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 //import org.apache.tomcat.util.http.fileupload.FileItem;
@@ -113,9 +116,11 @@ public class TrainModel extends HttpServlet {
 			
 			// to return the metrics
 		    try(PrintWriter out = response.getWriter();){
-		    	response.setContentType("application/json");
-				 out.print(model.metrics);
-				 out.flush();
+		    	ReturnTrained rt = new ReturnTrained(model.metrics.fitTime,model.metrics.scoreTime, model.metrics.size, model.metrics.error, model.metrics.accuracy, newFile);
+		    	String rtJsonString = new Gson().toJson(rt);
+		    	response.setContentType("application/json"); 
+				out.print(rtJsonString);
+				out.flush();
 		    }
 		    catch (Exception e) {
 				// TODO: handle exception
@@ -140,4 +145,32 @@ public class TrainModel extends HttpServlet {
 		}
 
 	}
+}
+
+//{
+//	  fit time: 408.069 ms,
+//	  score time: 31.624 ms,
+//	  validation data size: 110,
+//	  error: 5,
+//	  accuracy: 95.45%
+//	}
+
+class ReturnTrained{
+	private double fitTime=0.0;
+	private double scoreTime=0.0;
+	private int validationDataSize=0;
+	private int error=0;
+	private double accuracy=0.0;
+	private String modelName="";
+	
+	public ReturnTrained(double fitTime, double scoreTime, int validationDataSize, int error, double accuracy,
+			String modelName) {
+		super();
+		this.fitTime = fitTime;
+		this.scoreTime = scoreTime;
+		this.validationDataSize = validationDataSize;
+		this.error = error;
+		this.accuracy = accuracy;
+		this.modelName = modelName;
+	}	
 }
